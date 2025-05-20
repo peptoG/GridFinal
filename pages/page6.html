@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background-color: #a0c4ff;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #007acc;
+      background-color: #ffffffcc;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-link:hover {
+      background-color: #444;
+    }
+
+    .container {
+      padding-top: 80px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      grid-template-rows: repeat(10, 60px);
+      gap: 4px;
+      width: 95vw;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background-color: #444;
+      border: 1px solid #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition:
+        background-color 0.6s ease,
+        transform 0.5s ease,
+        opacity 0.5s ease,
+        filter 0.5s ease;
+      color: white;
+      opacity: 0.9;
+      font-size: 0.6rem;
+    }
+
+    .panel:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">← Back to Home</a>
+
+  <div class="container">
+    
+    <h1>Custom Color</h1>
+    <div class="grid-container" id="grid"></div>
+  </div>
+
+  <script>
+    const grid = document.getElementById("grid");
+
+    for (let i = 1; i <= 200; i++) {
+      const panel = document.createElement("div");
+      panel.className = "panel";
+      grid.appendChild(panel);
+    }
+
+    const panels = document.querySelectorAll(".panel");
+
+    window.addEventListener("mousemove", (e) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+      const maxDistance = Math.sqrt(winWidth ** 2 + winHeight ** 2);
+      const fadeRatio = 1 - (mouseY / winHeight);
+
+      panels.forEach((panel) => {
+        const rect = panel.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const dx = mouseX - centerX;
+        const dy = mouseY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const colorIntensity = Math.floor(255 - (distance / maxDistance) * 255);
+        const r = Math.floor(colorIntensity * Math.random());
+        const g = Math.floor(colorIntensity * Math.random());
+        const b = Math.floor(255 - colorIntensity * Math.random());
+
+        panel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+        const opacity = 0.5 + (1 - distance / maxDistance) * 0.5;
+        panel.style.opacity = opacity;
+
+        const scale = 0.9 + (1 - distance / maxDistance) * 0.6;
+        panel.style.transform = `scale(${scale})`;
+
+        panel.style.filter = `saturate(${fadeRatio})`;
+      });
+    });
+  </script>
+
+</body>
+</html>

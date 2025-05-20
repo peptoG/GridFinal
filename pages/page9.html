@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Page 4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: #d0f0ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      margin: 40px 0 10px;
+      font-size: 24px;
+      color: #333;
+      text-align: center;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #007acc;
+      background-color: #ffffffcc;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-link:hover {
+      background-color: #e0e0e0;
+    }
+
+    .grid-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 90vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .grid-label {
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .line-grid {
+      display: flex;
+      width: 90vw;
+      height: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .line {
+      flex: 1;
+      height: 100%;
+      cursor: grab;
+      transition: transform 0.2s ease;
+    }
+
+    .dragging {
+      opacity: 0.7;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">← Back to Home</a>
+
+  <h1>Vertical</h1>
+
+  <div class="grid-box">
+    <div class="grid-label"></div>
+    <div class="line-grid" id="lineGrid"></div>
+  </div>
+
+  <script>
+    const lineGrid = document.getElementById('lineGrid');
+    const lineCount = 80;
+
+    for (let i = 0; i < lineCount; i++) {
+      const line = document.createElement('div');
+      line.classList.add('line');
+      line.draggable = true;
+      line.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 60%)`;
+      line.id = `line-${i}`;
+
+      line.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', line.id);
+        line.classList.add('dragging');
+      });
+
+      line.addEventListener('dragend', () => {
+        line.classList.remove('dragging');
+      });
+
+      lineGrid.appendChild(line);
+    }
+
+    lineGrid.addEventListener('dragover', e => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      const afterElement = getDragAfterElement(lineGrid, e.clientX);
+      if (afterElement == null) {
+        lineGrid.appendChild(dragging);
+      } else {
+        lineGrid.insertBefore(dragging, afterElement);
+      }
+    });
+
+    function getDragAfterElement(container, x) {
+      const lines = [...container.querySelectorAll('.line:not(.dragging)')];
+      return lines.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = x - box.left - box.width / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: -Infinity }).element;
+    }
+  </script>
+
+</body>
+</html>

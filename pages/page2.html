@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shapes</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: #ffd6a5;;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 80px 0 20px;
+      font-size: 24px;
+      color: #333;
+    }
+
+   
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #007acc;
+      background-color: #ffffffcc;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-link:hover {
+      background-color: #e0e0e0;
+    }
+
+    .grid-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      max-width: 640px;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .grid-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .grid-label {
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(21, 12px);
+      grid-template-rows: repeat(21, 12px);
+      gap: 1px;
+    }
+
+    .square {
+      width: 12px;
+      height: 12px;
+      background-color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .circle-grid .inside    { background-color: #4a90e2; }
+    .triangle-grid .inside  { background-color: #e26a6a; }
+    .diamond-grid .inside   { background-color: #7ed957; }
+    .cross-grid .inside     { background-color: #f3b000; }
+
+    .square.row-grow {
+      transform: scaleX(2);
+    }
+
+    @media (max-width: 600px) {
+      .grid-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">← Back to Home</a>
+
+  <h1>Shapes</h1>
+
+  <div class="grid-wrapper">
+    <div class="grid-box">
+      <div class="grid-label">Circle Grid</div>
+      <div class="grid circle-grid"></div>
+    </div>
+    <div class="grid-box">
+      <div class="grid-label">Triangle Grid</div>
+      <div class="grid triangle-grid"></div>
+    </div>
+    <div class="grid-box">
+      <div class="grid-label">Diamond Grid</div>
+      <div class="grid diamond-grid"></div>
+    </div>
+    <div class="grid-box">
+      <div class="grid-label">Cross Grid</div>
+      <div class="grid cross-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    const size = 21;
+    const radius = Math.floor(size / 2);
+
+    function createGrid(gridElement, shapeCheck) {
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const square = document.createElement('div');
+          square.classList.add('square');
+          square.dataset.row = y;
+          if (shapeCheck(x, y)) {
+            square.classList.add('inside');
+          }
+          gridElement.appendChild(square);
+        }
+      }
+
+      gridElement.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('square')) {
+          const row = e.target.dataset.row;
+          gridElement.querySelectorAll(`.square[data-row="${row}"]`).forEach(sq => {
+            sq.classList.add('row-grow');
+          });
+        }
+      });
+
+      gridElement.addEventListener('mouseout', (e) => {
+        if (e.target.classList.contains('square')) {
+          const row = e.target.dataset.row;
+          gridElement.querySelectorAll(`.square[data-row="${row}"]`).forEach(sq => {
+            sq.classList.remove('row-grow');
+          });
+        }
+      });
+    }
+
+    createGrid(document.querySelector('.circle-grid'), (x, y) => {
+      const dx = x - radius;
+      const dy = y - radius;
+      return Math.sqrt(dx * dx + dy * dy) < radius;
+    });
+
+    createGrid(document.querySelector('.triangle-grid'), (x, y) => x <= y);
+
+    createGrid(document.querySelector('.diamond-grid'), (x, y) => {
+      const dx = Math.abs(x - radius);
+      const dy = Math.abs(y - radius);
+      return dx + dy <= radius;
+    });
+
+    createGrid(document.querySelector('.cross-grid'), (x, y) => {
+      return x === radius || y === radius;
+    });
+  </script>
+
+</body>
+</html>

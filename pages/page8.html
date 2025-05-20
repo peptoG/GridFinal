@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jumble</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: #e3d7ff; 
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin: 80px 0 20px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .back-link {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 14px;
+  text-decoration: none;
+  color: #007acc;
+  background-color: #ffffffcc;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+
+    .back-link.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .back-link:hover {
+      background-color: #e0e0e0;
+    }
+
+    .grid-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .grid-label {
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .messy-grid {
+      position: relative;
+      width: 264px;
+      height: 264px;
+      background-color: #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .messy-box {
+      width: 80px;
+      height: 80px;
+      background-color: #9c27b0;
+      color: white;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      cursor: grab;
+      border-radius: 4px;
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+
+    .dragging {
+      opacity: 0.7;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="back-link" id="backLink">← Back to Home</a>
+
+  <h1>Jumble</h1>
+
+  <div class="grid-box">
+    <div class="grid-label">Messy Grid</div>
+    <div class="messy-grid" id="messyGrid"></div>
+  </div>
+
+  <script>
+    const gridSize = 3;
+    const boxSize = 80;
+    const gridGap = 8;
+    const snapSize = boxSize + gridGap;
+    const boxCount = gridSize * gridSize;
+
+    const messyGrid = document.getElementById('messyGrid');
+    const backLink = document.getElementById('backLink');
+
+    for (let i = 0; i < boxCount; i++) {
+      const box = document.createElement('div');
+      box.classList.add('messy-box');
+      box.textContent = i + 1;
+      box.id = `box-${i}`;
+      box.draggable = true;
+
+
+      box.style.left = `${Math.random() * (messyGrid.clientWidth - boxSize)}px`;
+      box.style.top = `${Math.random() * (messyGrid.clientHeight - boxSize)}px`;
+
+      box.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', box.id);
+        setTimeout(() => box.classList.add('dragging'), 0);
+      });
+
+      box.addEventListener('dragend', () => {
+        box.classList.remove('dragging');
+      });
+
+      messyGrid.appendChild(box);
+    }
+
+    messyGrid.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    messyGrid.addEventListener('drop', e => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const box = document.getElementById(id);
+      const rect = messyGrid.getBoundingClientRect();
+
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+
+      const x = Math.floor(offsetX / snapSize) * snapSize;
+      const y = Math.floor(offsetY / snapSize) * snapSize;
+
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+
+      setTimeout(checkIfComplete, 100);
+    });
+
+    function checkIfComplete() {
+      let correct = 0;
+      for (let i = 0; i < boxCount; i++) {
+        const box = document.getElementById(`box-${i}`);
+        const expectedX = (i % gridSize) * snapSize;
+        const expectedY = Math.floor(i / gridSize) * snapSize;
+        const actualX = parseInt(box.style.left);
+        const actualY = parseInt(box.style.top);
+        if (actualX === expectedX && actualY === expectedY) {
+          correct++;
+        }
+      }
+      if (correct === boxCount) {
+        backLink.classList.add('visible');
+      }
+    }
+  </script>
+
+</body>
+</html>

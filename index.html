@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+
+  <div class="tic-tac-grid">
+    <a href="pages/page1.html" class="cell cell-1" data-cell="cell-1"></a>
+    <a href="pages/page2.html" class="cell cell-2" data-cell="cell-2"></a>
+    <a href="pages/page3.html" class="cell cell-3" data-cell="cell-3"></a>
+    <a href="pages/page4.html" class="cell cell-4" data-cell="cell-4"></a>
+    <a href="pages/page5.html" class="cell cell-5" data-cell="cell-5"></a>
+    <a href="pages/page6.html" class="cell cell-6" data-cell="cell-6"></a>
+    <a href="pages/page7.html" class="cell cell-7" data-cell="cell-7"></a>
+    <a href="pages/page8.html" class="cell cell-8" data-cell="cell-8"></a>
+    <a href="pages/page9.html" class="cell cell-9" data-cell="cell-9"></a>
+  </div>
+
+  <button id="resetButton" title="Reset Grid"></button>
+
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const resetBtn = document.getElementById('resetButton');
+
+    const winningCombos = [
+      ["cell-1", "cell-2", "cell-3"],
+      ["cell-4", "cell-5", "cell-6"],
+      ["cell-7", "cell-8", "cell-9"],
+      ["cell-1", "cell-4", "cell-7"],
+      ["cell-2", "cell-5", "cell-8"],
+      ["cell-3", "cell-6", "cell-9"],
+      ["cell-1", "cell-5", "cell-9"],
+      ["cell-3", "cell-5", "cell-7"]
+    ];
+
+    let disabledCells = JSON.parse(localStorage.getItem('disabledCells')) || [];
+    let clickedCells = JSON.parse(localStorage.getItem('clickedCells')) || [];
+
+
+    disabledCells.forEach(className => {
+      const cell = document.querySelector(`.${className}`);
+      if (cell) {
+        cell.style.backgroundColor = 'black';
+        cell.style.pointerEvents = 'none';
+      }
+    });
+
+ 
+    cells.forEach(cell => {
+      const cellClass = cell.dataset.cell;
+      const link = cell.getAttribute('href');
+      if (!cellClass || !link) return;
+
+  
+      if (disabledCells.includes(cellClass)) {
+        cell.style.pointerEvents = 'none';
+        return;
+      }
+
+      cell.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        if (!clickedCells.includes(cellClass)) {
+          clickedCells.push(cellClass);
+          localStorage.setItem('clickedCells', JSON.stringify(clickedCells));
+        }
+
+
+        winningCombos.forEach(combo => {
+          if (combo.every(c => clickedCells.includes(c))) {
+            combo.forEach(c => {
+              if (!disabledCells.includes(c)) {
+                disabledCells.push(c);
+              }
+              const el = document.querySelector(`.${c}`);
+              if (el) {
+                el.style.backgroundColor = 'black';
+                el.style.pointerEvents = 'none';
+              }
+            });
+          }
+        });
+
+        localStorage.setItem('disabledCells', JSON.stringify(disabledCells));
+        window.location.href = link;
+      });
+    });
+
+
+    resetBtn.addEventListener('click', () => {
+      localStorage.removeItem('clickedCells');
+      localStorage.removeItem('disabledCells');
+      location.reload();
+    });
+  </script>
+
+</body>
+</html>

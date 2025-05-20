@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wave</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #9bf6ff;
+      font-family: 'Press Start 2P', monospace;
+      color: white;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #007acc;
+      background-color: #ffffffcc;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-link:hover {
+      background-color: #333;
+    }
+
+    h1 {
+      margin: 60px 0 0;
+      font-size: 24px;
+      text-align: center;
+      color: #001f3f;
+    }
+
+    .wave-grid {
+      display: grid;
+      grid-template-columns: repeat(100, 10px);
+      gap: 2px;
+      background: #001f3f;
+      padding: 20px;
+      margin: 40px auto 0; 
+      border-radius: 10px;
+      width: fit-content;
+    }
+
+    .wave-box {
+      background: #cce7ff;
+      height: 20px;
+      width: 10px;
+      transition: transform 0.3s ease, background 0.3s ease;
+      transform-origin: bottom;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="back-link">← Back to Home</a>
+
+  <h1>Wave</h1>
+
+  <div class="wave-grid" id="waveGrid"></div>
+
+  <script>
+    const waveContainer = document.getElementById('waveGrid');
+    const waveBoxes = [];
+
+    for (let i = 0; i < 100; i++) {
+      const box = document.createElement('div');
+      box.classList.add('wave-box');
+      waveContainer.appendChild(box);
+      waveBoxes.push(box);
+    }
+
+    waveBoxes.forEach((box, i) => {
+      box.addEventListener('mouseenter', () => {
+        waveBoxes.forEach((other, j) => {
+          const dist = Math.abs(j - i);
+          const scale = Math.max(3 - dist * 0.3, 1);
+          const light = Math.max(85 - dist * 8, 30);
+          other.style.transform = `scaleY(${scale})`;
+          other.style.backgroundColor = `hsl(210, 80%, ${light}%)`;
+        });
+      });
+
+      box.addEventListener('mouseleave', () => {
+        waveBoxes.forEach(b => {
+          b.style.transform = 'scaleY(1)';
+          b.style.backgroundColor = '#cce7ff';
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
